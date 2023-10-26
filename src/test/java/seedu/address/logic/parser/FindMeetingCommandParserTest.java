@@ -18,8 +18,8 @@ import seedu.address.model.meeting.GeneralMeetingPredicate;
 import seedu.address.model.meeting.LocationContainsKeywordsPredicate;
 import seedu.address.model.meeting.MeetingTime;
 import seedu.address.model.meeting.MeetingTimeContainsPredicate;
-import seedu.address.model.meeting.TagContainsKeywordsPredicate;
 import seedu.address.model.meeting.TitleContainsKeywordsPredicate;
+import seedu.address.model.tag.TagContainsKeywordsPredicate;
 
 public class FindMeetingCommandParserTest {
 

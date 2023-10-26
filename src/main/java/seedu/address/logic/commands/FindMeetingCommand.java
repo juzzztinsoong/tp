@@ -2,6 +2,10 @@ package seedu.address.logic.commands;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.logging.Logger;
+
+import seedu.address.Main;
+import seedu.address.commons.core.LogsCenter;
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.Messages;
 import seedu.address.model.Model;
@@ -22,6 +26,7 @@ public class FindMeetingCommand extends Command {
             + "Parameters: m/KEYWORDS a/KEYWORDS n/KEYWORDS t/KEYWORDS s/LOCALDATETIME e/LOCALDATETIME\n"
             + "Example: " + COMMAND_WORD + " m/CS2103T Meeting s/01.09.2023 1000 e/30.09.2023 1200";
 
+    private static Logger logger = LogsCenter.getLogger(Main.class);
     private final GeneralMeetingPredicate predicate;
 
     /**
@@ -29,12 +34,13 @@ public class FindMeetingCommand extends Command {
      * @param predicate The predicate that will be used by the FindMeetingCommand object.
      */
     public FindMeetingCommand(GeneralMeetingPredicate predicate) {
-        requireNonNull(predicate);
+        assert predicate != null;
         this.predicate = predicate;
     }
 
     @Override
     public CommandResult execute(Model model) {
+        logger.info("Begin FindMeetingCommand execution");
         requireNonNull(model);
         model.updateFilteredMeetingList(predicate);
         return new CommandResult(

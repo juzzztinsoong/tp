@@ -13,9 +13,9 @@ My contributions to the project are listed below.
 
   - Add 2 new displays to UI for Meeting schedule and view commands
   - New Commands + Test cases
-    - "viewc"
+    - `viewc`
       - Command to view all details of a contact
-    - "viewm"
+    - `viewm`
       - Command to view all details of a meeting, including listing all attendees
 
 - **Code contributed**: [RepoSense link](https://nus-cs2103-ay2324s1.github.io/tp-dashboard/?search=lomaply&breakdown=true)
@@ -30,13 +30,15 @@ My contributions to the project are listed below.
   - New Command
     - "editm"
       - Command to edit fields of existing meetings
-      - Command does not edit meeting Attendees as it is handled by "addmc" and "rmmc"
+      - Command does not edit meeting Attendees as it is handled by `addmc` and `rmmc`
 
 - **Documentation**:
 
   - User Guide
     - First draft of User Guide with initial plans for v1.2
-    - Update parts of User Guide on features added/modified by me
+    - Update parts of User Guide on `viewm`, `viewc`, `editm`
+  - Developer Guide
+    - Add Implementation notes on `viewm` & `viewc`
 
 - **Community**:
 

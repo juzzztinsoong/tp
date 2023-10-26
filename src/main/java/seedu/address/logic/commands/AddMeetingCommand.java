@@ -7,6 +7,10 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_START;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_TITLE;
 
+import java.util.logging.Logger;
+
+import seedu.address.Main;
+import seedu.address.commons.core.LogsCenter;
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.Messages;
 import seedu.address.logic.commands.exceptions.CommandException;
@@ -40,6 +44,7 @@ public class AddMeetingCommand extends Command {
     public static final String MESSAGE_DUPLICATE_MEETING = "This meeting already exists in the address book";
     public static final String MESSAGE_ATTENDEE_NOT_FOUND = "Meeting attendee is not found in Persons list";
 
+    private static Logger logger = LogsCenter.getLogger(Main.class);
     private final Meeting toAdd;
 
     /**
@@ -52,6 +57,7 @@ public class AddMeetingCommand extends Command {
 
     @Override
     public CommandResult execute(Model model) throws CommandException {
+        logger.info("Begin AddMeetingCommand execution");
         requireNonNull(model);
 
         if (model.hasMeeting(toAdd)) {

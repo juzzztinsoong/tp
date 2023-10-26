@@ -6,6 +6,7 @@ import static seedu.address.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 import static seedu.address.logic.Messages.MESSAGE_UNKNOWN_COMMAND;
 import static seedu.address.logic.parser.ParserUtil.FORMAT;
 import static seedu.address.testutil.Assert.assertThrows;
+import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_MEETING;
 import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,8 @@ import seedu.address.logic.commands.ClearCommand;
 import seedu.address.logic.commands.DeleteCommand;
 import seedu.address.logic.commands.EditCommand;
 import seedu.address.logic.commands.EditCommand.EditPersonDescriptor;
+import seedu.address.logic.commands.EditMeetingCommand;
+import seedu.address.logic.commands.EditMeetingCommand.EditMeetingDescriptor;
 import seedu.address.logic.commands.ExitCommand;
 import seedu.address.logic.commands.FindCommand;
 import seedu.address.logic.commands.FindMeetingCommand;
@@ -36,10 +39,11 @@ import seedu.address.model.meeting.GeneralMeetingPredicate;
 import seedu.address.model.meeting.LocationContainsKeywordsPredicate;
 import seedu.address.model.meeting.Meeting;
 import seedu.address.model.meeting.MeetingTimeContainsPredicate;
-import seedu.address.model.meeting.TagContainsKeywordsPredicate;
 import seedu.address.model.meeting.TitleContainsKeywordsPredicate;
 import seedu.address.model.person.NameContainsKeywordsPredicate;
 import seedu.address.model.person.Person;
+import seedu.address.model.tag.TagContainsKeywordsPredicate;
+import seedu.address.testutil.EditMeetingDescriptorBuilder;
 import seedu.address.testutil.EditPersonDescriptorBuilder;
 import seedu.address.testutil.MeetingBuilder;
 import seedu.address.testutil.MeetingUtil;
@@ -85,6 +89,16 @@ public class AddressBookParserTest {
                 + PersonUtil.getEditPersonDescriptorDetails(descriptor);
         EditCommand command = (EditCommand) parser.parseCommand(str);
         assertEquals(new EditCommand(INDEX_FIRST_PERSON, descriptor), command);
+    }
+
+    @Test
+    public void parseCommand_editm() throws Exception {
+        Meeting meeting = new MeetingBuilder().build();
+        EditMeetingDescriptor descriptor = new EditMeetingDescriptorBuilder(meeting).build();
+        String str = EditMeetingCommand.COMMAND_WORD + " " + INDEX_FIRST_MEETING.getOneBased() + " "
+                + MeetingUtil.getEditMeetingDescriptorDetails(descriptor);
+        EditMeetingCommand command = (EditMeetingCommand) parser.parseCommand(str);
+        assertEquals(new EditMeetingCommand(INDEX_FIRST_MEETING, descriptor), command);
     }
 
     @Test

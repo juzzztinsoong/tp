@@ -1,10 +1,11 @@
-package seedu.address.model.meeting;
+package seedu.address.model.tag;
 
 import java.util.List;
 import java.util.function.Predicate;
 
 import seedu.address.commons.util.StringUtil;
 import seedu.address.commons.util.ToStringBuilder;
+import seedu.address.model.meeting.Meeting;
 
 /**
  * Tests that a {@code Meetings}'s {@code Title} matches any of the keywords given.

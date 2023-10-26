@@ -26,9 +26,9 @@ public class StatusTest {
 
         // invalid parts
         assertFalse(Status.isValidStatus("Insured"));
-        assertFalse(Status.isValidStatus("active"));
 
         // valid status
+        assertTrue(Status.isValidStatus("active"));
         assertTrue(Status.isValidStatus(""));
         assertTrue(Status.isValidStatus("Prospective"));
         assertTrue(Status.isValidStatus("Active"));

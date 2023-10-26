@@ -125,8 +125,8 @@ How the parsing works:
 
 The `Model` component,
 
-- stores the address book data i.e., all `Person` objects (which are contained in a `UniquePersonList` object).
-- stores the currently 'selected' `Person` objects (e.g., results of a search query) as a separate _filtered_ list which is exposed to outsiders as an unmodifiable `ObservableList<Person>` that can be 'observed' e.g. the UI can be bound to this list so that the UI automatically updates when the data in the list change.
+- stores the address book data i.e., all `Person` and `Meeting` objects (which are contained in a `UniquePersonList` and `UniqueMeetingList` object).
+- stores the currently 'selected' `Person` and `Meeting` objects (e.g., results of a search query) as a separate _filtered_ list which is exposed to outsiders as an unmodifiable `ObservableList<Person>` and `ObservableList<Meeting>` that can be 'observed' e.g. the UI can be bound to this list so that the UI automatically updates when the data in the list change.
 - stores a `UserPref` object that represents the user’s preferences. This is exposed to the outside as a `ReadOnlyUserPref` objects.
 - does not depend on any of the other three components (as the `Model` represents data entities of the domain, they should make sense on their own without depending on other components)
 
@@ -158,6 +158,73 @@ Classes used by multiple components are in the `seedu.addressbook.commons` packa
 
 This section describes some noteworthy details on how certain features are implemented.
 
+### View Contacts/Meetings feature
+
+#### Implementation
+
+Both the view contact command `viewc` and the view meeting command `viewm` are implemented in the exact same way due to the similarities between the `Person` and `Meeting` classes.
+
+As such, this section shall only detail the implementation of the `viewc` command. However the implementation of `viewm` can be derived by replacing some `Person` related functions/classes/objects with its `Meeting` counterpart.
+
+`viewc` and `viewm` both take in an index as their only argument. This refers to the `Person` or `Meeting` index respectively as displayed on either the Contact list or Meeting list.
+
+When `viewc 2` is used, an instance of a `ViewContactCommand` (`ViewMeetingCommand` in the case of `viewm`) is created as shown in the following Sequence Diagram. This step does not differ from the way other commands have been shown to be created. The argument for our example would just be `2`, which would be stored as the `targetIndex` field of the `ViewContactCommand` object.
+
+![ViewContactCommandSequenceDiagram](images/tracing/ViewContactCommandSequenceDiagram-View%20Contact%20Command%20Sequence.png)
+
+Once the instance of `ViewContactCommand` is created, it is executed. During execution, the command stores the contents of its `targetIndex` field in the `ModelManager` using its `setViewedPersonIndex` method as shown in the next Sequence Diagram. For `ViewMeetingCommand` it would use the `setViewedMeetingIndex` method instead.
+
+![StoreViewedItemsToModelDiagram](images/tracing/ViewCommandsSequenceDiagram-Store%20viewed%20Items%20to%20Model.png)
+
+Once the indexes of the `Person` and `Meeting` objects to view (if any) are stored in `ModelManager`, their corresponding `Person` and `Meeting` objects (in this case the 2nd `Person` as displayed on the list) are obtained by the `MainWindow` as a `Pair` through the `getViewedItems` method of the `LogicManager` class. As such, both objects can then be forwarded to the `InfoDisplayPanel` using `setViewedModel`, which then displays detailed information of both objects. This process is denoted in the final Sequence Diagram below.
+
+![ForwardViewedPersonMeetingtoUiDiagram](images/tracing/UiViewItemsSequenceDiagram-Forward%20Viewed%20Person%20&%20Meeting%20to%20Ui.png)
+
+#### Design Considerations and Rationale
+
+1. Passing viewed `Person` and `Meeting` from Model to Ui through Logic:
+   - `ViewContactCommand` and `ViewMeetingCommand` only have access to the `ModelManager` while `MainWindow` only has access to `LogicManager`.
+   - To prevent excessive and unnecessary coupling for the sake of two commands, it is deemed more worthwhile to use `LogicManager` as a proxy between `ModelManager` and `MainWindow`, especially since `LogicManager` already had access to `ModelManager`.
+2. Storing the viewed `Person` and `Meeting` as fields in `ModelManager`:
+   - The behaviour of `ModelManager` is not contradicted as it is already responsible for storing both the filtered lists of `Person` and `Meeting` objects that are displayed in the Ui.
+3. Storing the `Index` of the viewed `Person` and `Meeting` rather than a copy of the objects directly:
+   - Storing a copy of the objects was done initially but led to a display issue.
+   - When the fields of any currently viewed item are edited, the display does not update as the copy of the original viewed item does not get updated as well.
+   - Storing the `Index` fixes this issue as the `Person` and `Meeting` objects are only forwarded to the Ui after the execution of a command.
+   - This does lead to a separate issue where deleting a `Person` or `Meeting` object might lead to the wrong item being displayed due to a change in displayed list index. A simple solution is to simply reset the viewed item in question to nothing until their respective view commands are used again.
+
+
+### Find meeting feature
+
+The find meeting command is facilitated by `GeneralMeetingPredicate` that by itself is the combined predicate for all the meeting data fields. It is placed within the Model component and is only dependent on other predicate classes and `Meeting`.
+
+`findm` is supported by 5 sub-predicates that would search their respective fields.
+- m/TITLE_KEYWORDS  —  Finds meetings which `Title` contain any of the keywords given using `TitleContainsKeywordsPredicate`.
+- a/LOCATION_KEYWORDS  —  Finds meetings which `Location` contain any of the keywords given using `LocationContainsKeywordsPredicate`.
+- n/ATTENDEE_KEYWORDS  —  Finds meetings which set of `Attendee` contain any of the keywords given using `AttendeeContainsKeywordsPredicate`.
+- t/TAG_KEYWORDS  —  Finds meetings which set of `Tag` contain any of the keywords given using `TagContainsKeywordsPredicate`.
+- s/START e/END  —  Finds meetings that fall within the range of time given by START & END using `MeetingTimeContainsPredicate`. (Both START & END must come together)
+
+All of these fields are optional and typing `findm` alone will not impose any predicates, except MeetingTimeContainsPredicate which would find all meetings from 1st January of Year 1 A.D. to 31st December of Year 9999 A.D.
+
+Given below is an example usage scenario and how the `findm` command behaves at each step.
+
+Step 1. The user launches the application and the application loads the data from storage.
+The existing objects are shown below. Objects not relevant to the behaviour are excluded.
+![FindMeetingInitial](images/FindMeetingInitial.png)
+
+Step 2. The user executes `findm m/meeting` command to find all meetings that have the keyword `meeting` in their title. This results in the logic component creating an `AddressBookParser` object to make a `FindMeetingCommandParser` object which will in turn create the predicate objects as well as the FindMeetingCommand object. The argument is broken down by `PREFIX` and for each `PREFIX` there is a String array of arguments broken down by whitespace. (s/START & e/END use `LocalDateTime` instead)
+![FindMeetingSecond](images/FindMeetingSecond.png)
+
+Step 3. The `FindMeetingCommand` will be immediately executed on the `FilteredList<Meeting>` object. The `GeneralMeetingPredicate` will be used on all meetings, meetings which pass all 5 predicates be shown in `MeetingSchedulePanel`. After which `FindMeetingCommand` and the predicate objects will no longer be referenced.
+![FindMeetingLast](images/FindMeetingInitial.png)
+
+The following diagrams show the entire sequence flow for `LogicManager#execute()` for FindMeetingCommand.
+![FindMeetingSequence](images/FindMeetingSequence.png)
+![FindMeetingSequenceParse](images/FindMeetingSequenceParse.png)
+![FindMeetingSequenceExecute](images/FindMeetingSequenceExecute.png)
+
+
 ### Add attendee feature
 User can specify a Person to add as an Attendee to a specified Meeting.
 
@@ -175,6 +242,7 @@ The following sequence diagram shows how the add attendee operation works:
 
 A Person object can be obtained from a Meeting's list of attendees by searching through `UniquePersonList`
 for a `Person` with a name matching `attendeeName`.
+
 
 ### \[Proposed\] Undo/redo feature
 
@@ -290,25 +358,30 @@ _{Explain here how the data archiving feature will be implemented}_
 
 Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unlikely to have) - `*`
 
-| Priority | As a …​                           | I want to …​                    | So that I can…​                          |
-| -------- | --------------------------------- | ------------------------------- | ---------------------------------------- |
-| `[EPIC]` | user who has meetings             | have a meeting schedule         | keep track of them                       |
-| `* * *`  | user                              | create new meetings             |                                          |
-| `* * *`  | user                              | delete meetings                 |                                          |
-| `* * *`  | user                              | view meetings                   |                                          |
-| `* * *`  | user                              | view a specific meeting         | see more details                         |
-| `* *`    | user                              | sort my meetings by date        | see which ones come first                |
-| `[EPIC]` | user who meets people             | have an address book            | keep track of them                       |
-| `* * *`  | user                              | create new contacts             |                                          |
-| `* * *`  | user                              | delete contacts                 |                                          |
-| `* * *`  | user                              | view contacts                   |                                          |
-| `* * *`  | user                              | view a specific contact         | see more details                         |
-| `[EPIC]` | user who has meetings with people | schedule meetings with contacts | keep track of who is attending a meeting |
-| `* * *`  | user                              | add contacts to meetings        |                                          |
-| `* * *`  | user                              | remove contacts from meetings   |                                          |
-| `* * *`  | user                              | view contacts in meetings       |                                          |
-| `*`      | user                              | assign named tags to meetings   | organise meetings                        |
-| `*`      | user                              | filter meetings by tags         | view related meetings together           |
+
+| Priority | As a …​                                   | I want to …​                    | So that I can…​                       |
+| -------- | ----------------------------------------- | ------------------------------- | ------------------------------------- |
+| `[EPIC]` | agent who has meetings                    | have a meeting schedule         | keep track of them                    |
+| `* * *`  | agent                                     | create new meetings             |                                       |
+| `* * *`  | agent                                     | delete meetings                 |                                       |
+| `* * *`  | agent                                     | view meetings                   |                                       |
+| `* * *`  | agent                                     | view a specific meeting         | see more details                      |
+| `* *`    | agent                                     | edit a meeting                  | change its details                    |
+| `* *`    | agent                                     | sort my meetings by date        | see which ones come first             |
+| `*`      | agent                                     | mark meetings as complete       | know which meetings are done          |
+| `[EPIC]` | agent who has clients                     | have an address book            | keep track of them                    |
+| `* * *`  | agent                                     | create new contacts             |                                       |
+| `* * *`  | agent                                     | delete contacts                 |                                       |
+| `* * *`  | agent                                     | view contacts                   |                                       |
+| `* * *`  | agent                                     | view a specific contact         | see more details                      |
+| `* *`    | agent                                     | edit a contact                  | change its details                    |
+| `*`      | agent                                     | assign named tags to meetings   | organise meetings                     |
+| `*`      | agent                                     | filter meetings by tags         | view related meetings together        |
+| `[EPIC]` | agent who meets with clients              | schedule meetings with contacts | keep track of the client I am meeting |
+| `* * *`  | agent                                     | add contacts to meetings        |                                       |
+| `* * *`  | agent                                     | remove contacts from meetings   |                                       |
+| `* * *`  | agent                                     | view contacts in meetings       |                                       |
+| `*`      | agent who wants to meet clients regularly | know the last contacted date    | when to touch base with a client      |
 
 
 _{More to be added}_
@@ -363,6 +436,7 @@ _{More to be added}_
 1.  User requests to list meetings.
 2.  OutBook shows a list of meetings.
 3.  User requests to view details of a specific meeting.
+4.  OutBook shows the details of the meeting. 
 4.  User requests to remove a specific contact from the meeting.
 5.  OutBook removes the contact from the meeting.
 
@@ -374,21 +448,52 @@ _{More to be added}_
 
   Use case ends.
 
-- 3a. There are no contacts in the meeting.
+- 3a. The given meeting index is invalid.
 
-  Use case ends.
-
-- 4a. The given meeting index is invalid.
-
-  - 4a1. OutBook shows an error message.
+  - 3a1. OutBook shows an error message.
 
     Use case resumes at step 2.
 
-- 4b. The given contact index is invalid.
+- 4a. There are no contacts in the meeting.
 
-  - 4b1. OutBook shows an error message.
+  Use case ends.
+
+- 5a. The given meeting index is invalid.
+
+  - 5a1. OutBook shows an error message.
+
+    Use case resumes at step 2.
+
+- 5b. The given contact index is invalid.
+
+  - 5b1. OutBook shows an error message.
 
     Use case resumes at step 3.
+
+
+**Use case: Mark meeting as complete**
+
+**MSS**
+
+1. User requests to mark a specific meeting as complete
+2. OutBook marks the specific meeting as complete
+3. OutBook updates the last contacted date of attendees to the meeting date
+
+   Use case ends. 
+
+**Extensions**
+
+- 1a. The given meeting index is invalid.
+
+  - 1a1. OutBook shows an error message.
+
+    Use case resumes from the start.
+
+- 1b. The given meeting is already marked complete.
+
+  - 1b1. OutBook shows an error message.
+
+    Use case ends.
 
 _{More to be added}_
 

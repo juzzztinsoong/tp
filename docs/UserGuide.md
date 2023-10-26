@@ -27,7 +27,7 @@ OutBook is an app that allows busy professionals to manage their numerous contac
 
    * `listc` : Lists all contacts.
 
-   * `addc n/John Doe p/98765432 e/johnd@example.com o/NUS` : Adds a contact named `John Doe` to OutBook.
+   * `addc n/John Doe p/98765432 e/johnd@example.com l/10.10.2023 1000 o/NUS` : Adds a contact named `John Doe` to OutBook.
 
    * `deletec 3` : Deletes the 3rd contact shown in the current list.
 
@@ -77,9 +77,9 @@ Format: `help`
 
 Adds a contact to OutBook.
 
-Format: `addc n/NAME p/PHONE_NUMBER e/EMAIL s/STATUS [t/TAG]…​`
+Format: `addc n/NAME p/PHONE_NUMBER e/EMAIL l/LAST_CONTACTED_TIME s/STATUS [t/TAG]…​`
 
-* NAME, PHONE_NUMBER and EMAIL are compulsory fields. STATUS and TAG are optional.
+* NAME, PHONE_NUMBER, EMAIL and LAST_CONTACTED_TIME are compulsory fields. STATUS and TAG are optional.
 * PHONE_NUMBER must contain only numbers, and be at least 3 digits long.
 * EMAIL must be of the format local-part@domain and adhere to the following constraints:
   1. The local-part should only contain alphanumeric characters and these special characters, excluding the parentheses, (+_.-).
@@ -89,6 +89,8 @@ Format: `addc n/NAME p/PHONE_NUMBER e/EMAIL s/STATUS [t/TAG]…​`
       - end with a domain label at least 2 characters long
       - have each domain label start and end with alphanumeric characters
       - have each domain label consist of alphanumeric characters, separated only by hyphen
+* LAST_CONTACTED_TIME must contain both date and time and adhere to the dd.MM.yyyy HHmm format.
+  -  For instance, 1st October 2023, 10:00am will be written as 01.10.2023 1000.
 * STATUS, if included, must be one of { NIL, Prospective, Active, Inactive, Claimant, Renewal } or blank.
 
 <div markdown="span" class="alert alert-primary">:bulb: **Tip:**
@@ -96,8 +98,8 @@ A person can have any number of tags (including 0)
 </div>
 
 Examples:
-* `addc n/John Doe p/98765432 e/johnd@example.com`
-* `addc n/Betsy Crowe t/friend e/betsycrowe@example.com p/1234567 t/Professor`
+* `addc n/John Doe p/98765432 e/johnd@example.com l/01.10.2023 1000`
+* `addc n/Betsy Crowe t/friend e/betsycrowe@example.com p/1234567 l/01.01.2023 0100 t/Professor`
 
 
 ### Listing all persons : `listc`
@@ -126,7 +128,7 @@ Examples:
 
 Edits an existing contact in OutBook.
 
-Format: `editc INDEX [n/NAME] [p/PHONE] [e/EMAIL] [s/STATUS] [t/TAG]…​`
+Format: `editc INDEX [n/NAME] [p/PHONE] [e/EMAIL] [l/LAST_CONTACTED_TIME] [s/STATUS] [t/TAG]…​`
 
 * Edits the contact at the specified `INDEX`. The index refers to the index number shown in the displayed person list. The index **must be a positive integer** 1, 2, 3, …​
 * All fields are optional, but at least one must be provided.
@@ -149,7 +151,7 @@ Format: `viewc INDEX`
 * Views detailed information of the contact at the specified `INDEX`.
 * The index refers to the index number shown in the displayed person list.
 * The index **must be a positive integer** 1, 2, 3, …​
-* Displays contact Name, Phone, Email, Status, Remarks and Tags.
+* Displays contact Name, Phone, Email, Last Contacted Time, Status, Remarks and Tags.
 
 Examples:
 * `viewc 2` Displays detailed information related to the 2nd contact on the list.
@@ -181,6 +183,9 @@ Examples:
 Adds a meeting to OutBook.
 
 Format: `addm m/TITLE a/LOCATION s/START e/END`
+
+* START and END must contain both date and time and adhere to the dd.MM.yyyy HHmm format.
+  -  For instance, 1st October 2023, 10:00am will be written as 01.10.2023 1000.
 
 Examples:
 * `addm m/Lunch a/Cafeteria s/20.09.2023 1200 e/20.09.2023 1300`
@@ -337,20 +342,20 @@ If your changes to the data file makes its format invalid, OutBook will discard 
 
 ## Command summary
 
-| Action                          | Format, Examples                                                                                                                                      |
-|---------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Add contact**                 | `addc n/NAME p/PHONE_NUMBER e/EMAIL o/ORGANISATION [t/TAG]…​` <br> e.g., `add n/James Ho p/22224444 e/jamesho@example.com o/NUS t/friend t/colleague` |
-| **Add contact to meeting**      | `addmc MEETING_INDEX CONTACT_INDEX` <br> e.g., `addmc 2 1`                                                                                            |
-| **Add meeting**                 | `addc m/TITLE a/LOCATION s/START e/END` <br> e.g., `addm m/Lunch a/Cafeteria s/20.09.2023 1200 e/20.09.2023 1300`                                     |
-| **Clear**                       | `clear`                                                                                                                                               |
-| **Delete contact**              | `deletec INDEX` <br> e.g., `deletec 3`                                                                                                                |
-| **Delete meeting**              | `deletem INDEX` <br> e.g., `deletem 3`                                                                                                                |
-| **Edit contact**                | `editc INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [o/ORGANISATION] [t/TAG]…​`<br> e.g.,`editc 2 n/James Lee e/jameslee@example.com`                    |
-| **Find contact**                | `findc KEYWORD [MORE_KEYWORDS]` <br> e.g., `findc James Jake`                                                                                         |
-| **Find meeting**                | `findm [m/KEYWORDS] [a/KEYWORDS] [t/KEYWORDS] [n/ATTENDEENAME] [s/START e/END]` <br> e.g., `findm m/Zoom Meet s/09.09.2023 0000 e/09.10.2023 0000`    |
-| **Help**                        | `help`                                                                                                                                                |
-| **List contacts**               | `listc`                                                                                                                                               |
-| **List meetings**               | `listm`                                                                                                                                               |
-| **Remove contact from meeting** | `rmmc MEETING_INDEX ATTENDEE_INDEX` <br> e.g., `rmmc 2 2`                                                                                             |
-| **View contact details**        | `viewc INDEX` <br> e.g., `viewc 4`                                                                                                                    |
-| **View meeting details**        | `viewm INDEX` <br> e.g., `viewm 4`                                                                                                                    |
+| Action                          | Format, Examples                                                                                                                                                                             |
+|---------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Add contact**                 | `addc n/NAME p/PHONE_NUMBER e/EMAIL l/LAST_CONTACTED_TIME o/ORGANISATION [t/TAG]…​` <br> e.g., `add n/James Ho p/22224444 e/jamesho@example.com l/09.09.2023 0000 o/NUS t/friend t/colleague` |
+| **Add contact to meeting**      | `addmc MEETING_INDEX CONTACT_INDEX` <br> e.g., `addmc 2 1`                                                                                                                                   |
+| **Add meeting**                 | `addc m/TITLE a/LOCATION s/START e/END` <br> e.g., `addm m/Lunch a/Cafeteria s/20.09.2023 1200 e/20.09.2023 1300`                                                                            |
+| **Clear**                       | `clear`                                                                                                                                                                                      |
+| **Delete contact**              | `deletec INDEX` <br> e.g., `deletec 3`                                                                                                                                                       |
+| **Delete meeting**              | `deletem INDEX` <br> e.g., `deletem 3`                                                                                                                                                       |
+| **Edit contact**                | `editc INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [l/LAST_CONTACTED_TIME] [o/ORGANISATION] [t/TAG]…​`<br> e.g.,`editc 2 n/James Lee e/jameslee@example.com`                                    |
+| **Find contact**                | `findc KEYWORD [MORE_KEYWORDS]` <br> e.g., `findc James Jake`                                                                                                                                |
+| **Find meeting**                | `findm [m/KEYWORDS] [a/KEYWORDS] [t/KEYWORDS] [n/ATTENDEENAME] [s/START e/END]` <br> e.g., `findm m/Zoom Meet s/09.09.2023 0000 e/09.10.2023 0000`                                           |
+| **Help**                        | `help`                                                                                                                                                                                       |
+| **List contacts**               | `listc`                                                                                                                                                                                      |
+| **List meetings**               | `listm`                                                                                                                                                                                      |
+| **Remove contact from meeting** | `rmmc MEETING_INDEX ATTENDEE_INDEX` <br> e.g., `rmmc 2 2`                                                                                                                                    |
+| **View contact details**        | `viewc INDEX` <br> e.g., `viewc 4`                                                                                                                                                           |
+| **View meeting details**        | `viewm INDEX` <br> e.g., `viewm 4`                                                                                                                                                           |

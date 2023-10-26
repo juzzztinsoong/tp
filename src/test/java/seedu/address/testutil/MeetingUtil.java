@@ -8,8 +8,12 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_TITLE;
 import static seedu.address.logic.parser.ParserUtil.FORMAT;
 
+import java.util.Set;
+
 import seedu.address.logic.commands.AddMeetingCommand;
+import seedu.address.logic.commands.EditMeetingCommand.EditMeetingDescriptor;
 import seedu.address.model.meeting.Meeting;
+import seedu.address.model.tag.Tag;
 
 /**
  * A utility class for Meeting.
@@ -38,6 +42,27 @@ public class MeetingUtil {
         meeting.getTags().stream().forEach(
                 s -> sb.append(PREFIX_TAG + s.tagName + " ")
         );
+        return sb.toString();
+    }
+
+    /**
+     * Returns the part of command string for the given {@code EditMeetingDescriptor}'s details.
+     */
+    public static String getEditMeetingDescriptorDetails(EditMeetingDescriptor descriptor) {
+        StringBuilder sb = new StringBuilder();
+        descriptor.getTitle().ifPresent(title -> sb.append(PREFIX_TITLE).append(title.meetingTitle).append(" "));
+        descriptor.getLocation().ifPresent(location -> sb.append(PREFIX_LOCATION).append(location.location)
+                .append(" "));
+        descriptor.getStart().ifPresent(start -> sb.append(PREFIX_START).append(start.format(FORMAT)).append(" "));
+        descriptor.getEnd().ifPresent(end -> sb.append(PREFIX_END).append(end.format(FORMAT)).append(" "));
+        if (descriptor.getTags().isPresent()) {
+            Set<Tag> tags = descriptor.getTags().get();
+            if (tags.isEmpty()) {
+                sb.append(PREFIX_TAG);
+            } else {
+                tags.forEach(s -> sb.append(PREFIX_TAG).append(s.tagName).append(" "));
+            }
+        }
         return sb.toString();
     }
 }

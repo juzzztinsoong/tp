@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import seedu.address.model.tag.TagContainsKeywordsPredicate;
 import seedu.address.testutil.MeetingBuilder;
 
 public class TagContainsKeywordsPredicateTest {

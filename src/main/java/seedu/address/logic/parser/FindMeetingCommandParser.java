@@ -10,7 +10,10 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_TITLE;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.logging.Logger;
 
+import seedu.address.Main;
+import seedu.address.commons.core.LogsCenter;
 import seedu.address.logic.commands.FindMeetingCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.meeting.AttendeeContainsKeywordsPredicate;
@@ -18,13 +21,14 @@ import seedu.address.model.meeting.GeneralMeetingPredicate;
 import seedu.address.model.meeting.LocationContainsKeywordsPredicate;
 import seedu.address.model.meeting.MeetingTime;
 import seedu.address.model.meeting.MeetingTimeContainsPredicate;
-import seedu.address.model.meeting.TagContainsKeywordsPredicate;
 import seedu.address.model.meeting.TitleContainsKeywordsPredicate;
+import seedu.address.model.tag.TagContainsKeywordsPredicate;
 
 /**
  * Parses input arguments and creates a new FindMeetingCommand object
  */
 public class FindMeetingCommandParser implements Parser<FindMeetingCommand> {
+    private static Logger logger = LogsCenter.getLogger(Main.class);
     private String defaultMinimumStartTime = "01.01.0001 0000";
     private String defaultMaximumEndTime = "31.12.9999 2359";
 
@@ -34,6 +38,9 @@ public class FindMeetingCommandParser implements Parser<FindMeetingCommand> {
      * @throws ParseException if the user input does not conform the expected format
      */
     public FindMeetingCommand parse(String args) throws ParseException {
+        logger.info("Begin FindMeetingCommand parse");
+        assert args != null;
+
         ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize(args, PREFIX_TITLE, PREFIX_LOCATION, PREFIX_START,
                 PREFIX_END, PREFIX_NAME, PREFIX_TAG);
         if (!argMultimap.getPreamble().isEmpty()) {
@@ -42,6 +49,7 @@ public class FindMeetingCommandParser implements Parser<FindMeetingCommand> {
         argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_TITLE, PREFIX_LOCATION, PREFIX_START,
                 PREFIX_END, PREFIX_NAME, PREFIX_TAG);
 
+        logger.info("Begin creation of Meeting predicates");
         String[] titleKeyWords = argMultimap.getValue(PREFIX_TITLE).orElse("").split("\\s+");
         String[] locationKeyWords = argMultimap.getValue(PREFIX_LOCATION).orElse("").split("\\s+");
         LocalDateTime start = ParserUtil.parseMeetingTime(argMultimap.getValue(PREFIX_START)
@@ -61,6 +69,8 @@ public class FindMeetingCommandParser implements Parser<FindMeetingCommand> {
                 new MeetingTimeContainsPredicate(start, end),
                 new AttendeeContainsKeywordsPredicate(Arrays.asList(attendeeKeyWords)),
                 new TagContainsKeywordsPredicate(Arrays.asList(tagKeyWords)));
+
+        logger.info("All Meeting predicates created");
 
         return new FindMeetingCommand(generalMeetingPredicate);
     }

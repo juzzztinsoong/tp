@@ -50,7 +50,7 @@ public class CommandTestUtil {
     public static final String VALID_START_MEETING1 = "20.09.2023 1000";
     public static final String VALID_START_MEETING2 = "11.10.2023 0900";
     public static final String VALID_STATUS_AMY = "";
-    public static final String VALID_STATUS_BOB = "Prospective";
+    public static final String VALID_STATUS_BOB = "prospective";
     public static final String VALID_REMARK_AMY = "Likes to swim";
     public static final String VALID_REMARK_BOB = "";
     public static final String VALID_END_MEETING1 = "20.09.2023 1200";
@@ -73,7 +73,7 @@ public class CommandTestUtil {
     public static final String LASTTIME_DESC_AMY = " " + PREFIX_LASTTIME + VALID_LASTTIME_AMY;
     public static final String LASTTIME_DESC_BOB = " " + PREFIX_LASTTIME + VALID_LASTTIME_BOB;
     public static final String START_DESC_MEETING1 = " " + PREFIX_START + VALID_START_MEETING1;
-    public static final String STATUS_DESC_AMY = " " + PREFIX_STATUS + "NIL";
+    public static final String STATUS_DESC_AMY = " " + PREFIX_STATUS + "nil";
     public static final String STATUS_DESC_BOB = " " + PREFIX_STATUS + VALID_STATUS_BOB;
     public static final String REMARK_DESC_AMY = " " + PREFIX_REMARK + VALID_REMARK_AMY;
     public static final String REMARK_DESC_BOB = " " + PREFIX_REMARK + VALID_REMARK_BOB;

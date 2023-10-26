@@ -2,6 +2,8 @@ package seedu.address.model.person;
 
 import static seedu.address.commons.util.AppUtil.checkArgument;
 
+import java.util.Locale;
+
 /**
  * Represents a Person's status
  * Guarantees: immutable; is valid as declared in {@link #isValidStatus(String)}
@@ -11,13 +13,13 @@ public class Status {
      * Represents the available statuses that can be assigned to a Person.
      */
     protected enum StatusList {
-        NIL,
-        Prospective,
-        Active,
-        Inactive,
-        Claimant,
-        Renewal,
-    };
+        nil,
+        prospective,
+        active,
+        inactive,
+        claimant,
+        renewal,
+    }
 
     public static final String DEFAULT_STATUS = "NIL";
 
@@ -45,7 +47,7 @@ public class Status {
             return true;
         }
         for (StatusList enumValue : StatusList.class.getEnumConstants()) {
-            if (enumValue.name().equals(input)) {
+            if (enumValue.name().equals(input.toLowerCase(Locale.ROOT))) {
                 return true;
             }
         }
